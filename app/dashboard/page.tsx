@@ -50,6 +50,13 @@ export default function DashboardPage() {
       status: "success",
       date: "2024-01-05",
     },
+    {
+      id: "6",
+      user: {name: "Vivek Kumar", email: "vivek@gmail.com"},
+      amount: 600.00,
+      status: "success",
+      date: "2026-05-02"
+    }
   ];
 
   return (
