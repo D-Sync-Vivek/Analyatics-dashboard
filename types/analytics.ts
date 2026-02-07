@@ -9,14 +9,11 @@ export interface MetricCardData {
 
 export interface Transaction{
     id: string;
-    user: {
-        name: string;
-        email: string;
-        avatar?: string;
-    };
+    customer_name: string,
+    customer_email: string,
     amount: number;
     status: 'pending' | 'success' | 'failed' | 'processing';
-    date: string;
+    created_at: string;
 }
 
 export interface DashboardCardProps{

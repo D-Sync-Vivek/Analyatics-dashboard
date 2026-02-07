@@ -8,11 +8,12 @@ export const columns: ColumnDef<Transaction>[] = [
         accessorKey: "user",
         header: "Customer",
         cell: ({ row }) => {
-            const user = row.original.user
+            const userName = row.original.customer_name;
+            const userEmail = row.original.customer_email;
             return (
                 <>
-                    <div className="font-medium">{user.name}</div>
-                    <div className="text-gray-600">{user.email}</div>
+                    <div className="font-medium">{userName}</div>
+                    <div className="text-gray-600">{userEmail}</div>
                 </>
             )
         }
@@ -39,8 +40,24 @@ export const columns: ColumnDef<Transaction>[] = [
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => {
-            const status = row.original.status
-            return <div>{status}</div>
-        }
+            const status = row.getValue("status") as string;
+            const normalizedStatus = status.toLowerCase();
+            // logic for dynamic coloring
+            const statusStyles: Record<string, string> = {
+                success: "bg-green-100 text-green-700 border-green-200", 
+                processing: "bg-blue-100 text-blue-700 border-blue-200",
+                failed: "bg-red-100 text-red-700 border-red-200",
+                pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+            };
+
+            // Fallback to gray if status is unknown
+            const style = statusStyles[status as keyof typeof statusStyles] || "bg-gray-800 text-gray-300";
+
+            return (
+                <span className={`px-2 py-1 rounded-full text-xs font-medium border ${style} capitalize`}>
+                    {status}
+                </span>
+            );
+        },
     }
 ];

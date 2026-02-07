@@ -4,60 +4,64 @@ import { DataTable } from "@/Components/DataTable";
 import { columns } from "./column";
 import { Settings, DollarSign, Users, CreditCard, Activity } from "lucide-react";
 import { Transaction } from "@/types/analytics";
+import { supabase } from "@/lib/supabase";
+import AddTransaction from "@/Components/AddTransaction";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+
+  const {data: transactions, error} = await supabase
+    .from('transactions')
+    .select('*')
+    .order('created_at', {ascending: false});
+
+  if(error){
+    console.log('Error fetching transactions', error)
+  }
+  
+  // Calculate real metrics
+  const safeTransactions = transactions || [];
+
+  // Revenue: Sum of successful transactions
+  const totalRevenue = safeTransactions.reduce((acc, curr) => {
+    return curr.status === "success" ? acc + curr.amount : acc;
+  }, 0);
+
+  // sales count
+  const salesCount = safeTransactions.filter(t => t.status === 'success').length;
+
+  // pending orders
+  const pendingOrder = safeTransactions.filter(t => 
+    t.status === "pending" || t.status === "processing").length
+
+  // average order value
+  const avgOrderValue = salesCount > 0 ? totalRevenue / salesCount : 0;
 
   const stats = [
-    { title: "Revenue", value: "$45,231.89", icon: DollarSign, trend: { value: 20.1, direction: "up" as const } },
-    { title: "Subscriptions", value: "+2350", icon: Users, trend: { value: 180.1, direction: "up" as const } },
-    { title: "Sales", value: "+12,234", icon: CreditCard, trend: { value: 19, direction: "up" as const } },
-    { title: "Active Now", value: "+573", icon: Activity, trend: { value: 201, direction: "up" as const } }
-  ];
-
-  const transactions: Transaction[] = [
     {
-      id: "1",
-      user: { name: "Liam Johnson", email: "liam@example.com" },
-      amount: 250.00,
-      status: "success",
-      date: "2024-01-02",
+      title: "Total Revenue",
+      value: new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(totalRevenue),
+      icon: DollarSign,
+      trend: {value: 12, direction: "up" as const}
     },
     {
-      id: "2",
-      user: { name: "Olivia Smith", email: "olivia@example.com" },
-      amount: 150.00,
-      status: "processing",
-      date: "2024-01-02",
+      title: "Successful Sales",
+      value: `+${salesCount}`,
+      icon: CreditCard,
+      trend: {value: 4, direction: "up" as const}
     },
     {
-      id: "3",
-      user: { name: "Noah Williams", email: "noah@example.com" },
-      amount: 350.00,
-      status: "success",
-      date: "2024-01-03",
+      title: "Pending Orders",
+      value: `${pendingOrder}`,
+      icon: Activity,
+      trend: {value: 2, direction: "down" as const}
     },
     {
-      id: "4",
-      user: { name: "Emma Brown", email: "emma@example.com" },
-      amount: 450.00,
-      status: "failed",
-      date: "2024-01-04",
-    },
-    {
-      id: "5",
-      user: { name: "James Jones", email: "james@example.com" },
-      amount: 550.00,
-      status: "success",
-      date: "2024-01-05",
-    },
-    {
-      id: "6",
-      user: {name: "Vivek Kumar", email: "vivek@gmail.com"},
-      amount: 600.00,
-      status: "success",
-      date: "2026-05-02"
+      title: "Avg. Order Value",
+      value: `${avgOrderValue}`,
+      icon: Users,
+      trend: {value: 0, direction: "up" as const}
     }
-  ];
+  ]
 
   return (
     <div className="flex flex-col gap-5 w-full"> 
@@ -84,14 +88,15 @@ export default function DashboardPage() {
         </div>
 
         {/* Right: Recent Sales Table (3 cols) */}
-        <div className="col-span-3 rounded-xl border bg-gray-800 shadow-sm overflow-hidden">
-          <div className="p-4 bg-gray-50 border-b">
-            <h2 className="font-semibold text-gray-800">Recent Sales</h2>
+        <div className="col-span-3 rounded-xl border bg-gray-800 shadow-sm md:overflow-hidden">
+          <div className="p-4 border-b">
+            <AddTransaction/>
+            <h2 className="font-semibold mt-3">Recent Sales</h2>
             <p className="text-sm text-gray-500">You made 265 sales this month.</p>
           </div>
           <div className="p-0">
              {/* The Reusable Table Component */}
-            <DataTable columns={columns} data={transactions} />
+            <DataTable columns={columns} data={transactions || []} />
           </div>
         </div>
 
