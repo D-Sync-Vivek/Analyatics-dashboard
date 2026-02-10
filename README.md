@@ -100,9 +100,9 @@ app/
 ├── dashboard/          # Protected dashboard routes
 │   ├── analytics/      # Chart visualizations
 │   ├── settings/       # User profile form
-│   ├── column.tsx
+│   ├── column.tsx      # Table Column
 │   ├── layout.tsx      # Sidebar & Header shell
-│   ├── loading.tsx
+│   ├── loading.tsx     # Skeleton Shell
 │   └── page.tsx        # Main overview (Server Component)
 └── layout.tsx          # Root layout with Providers
 components/             # Reusable UI components (Charts, Tables, Cards)
