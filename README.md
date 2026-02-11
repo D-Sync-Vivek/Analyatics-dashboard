@@ -20,7 +20,7 @@ A full-stack, real-time analytics platform built to demonstrate modern web archi
 
 ## 🛠️ Tech Stack
 
-- **Framework:** Next.js 1 (App Router)
+- **Framework:** Next.js 16 (App Router)
 
 - **Language:** TypeScript
 
